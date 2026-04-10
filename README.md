@@ -46,7 +46,7 @@ database/
 2. data/seed.sql (opcionalmente como extra, test.sql)
 
 ## Esquema visual
-[![Esquema visual](./assets/20260409.svg)](./assets/20260409.svg)
+[![Esquema visual](./assets/20260410.svg)](./assets/20260410.svg)
 > Haz clic en la imagen para abrirla en una pestaña nueva con zoom completo.
 
 
