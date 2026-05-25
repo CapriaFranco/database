@@ -1,0 +1,4 @@
+-- ==========================================
+-- TRIGGERS
+-- ==========================================
+-- Estos triggers se usarán principalmente para completar auditoría.

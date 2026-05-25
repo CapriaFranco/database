@@ -1,5 +1,44 @@
 -- SQL Server 2019 T-SQL conversion from MySQL schema
 
+DROP TABLE IF EXISTS [dbo].[proveedor_categoria];
+DROP TABLE IF EXISTS [dbo].[categorias];
+DROP TABLE IF EXISTS [dbo].[metodo_pago];
+DROP TABLE IF EXISTS [dbo].[proveedores];
+DROP TABLE IF EXISTS [dbo].[tipo_metodo_pago];
+DROP TABLE IF EXISTS [dbo].[clientes];
+DROP TABLE IF EXISTS [dbo].[fisicas_juridicas];
+DROP TABLE IF EXISTS [dbo].[familia_roles];
+DROP TABLE IF EXISTS [dbo].[usuario_familias];
+DROP TABLE IF EXISTS [dbo].[familias];
+DROP TABLE IF EXISTS [dbo].[usuario_permisos];
+DROP TABLE IF EXISTS [dbo].[configuracion_sistema];
+DROP TABLE IF EXISTS [dbo].[auditoria];
+DROP TABLE IF EXISTS [dbo].[tipo_accion];
+DROP TABLE IF EXISTS [dbo].[domicilios];
+DROP TABLE IF EXISTS [dbo].[documentos];
+DROP TABLE IF EXISTS [dbo].[tipo_documento];
+DROP TABLE IF EXISTS [dbo].[contactos];
+DROP TABLE IF EXISTS [dbo].[tipo_contacto];
+DROP TABLE IF EXISTS [dbo].[empleados];
+DROP TABLE IF EXISTS [dbo].[cargos];
+DROP TABLE IF EXISTS [dbo].[entidad_tipos];
+DROP TABLE IF EXISTS [dbo].[entidad_tipo];
+DROP TABLE IF EXISTS [dbo].[juridicas];
+DROP TABLE IF EXISTS [dbo].[tipo_social];
+DROP TABLE IF EXISTS [dbo].[fisicas];
+DROP TABLE IF EXISTS [dbo].[entidades];
+DROP TABLE IF EXISTS [dbo].[localidades];
+DROP TABLE IF EXISTS [dbo].[provincias];
+DROP TABLE IF EXISTS [dbo].[paises];
+DROP TABLE IF EXISTS [dbo].[usuario_roles];
+DROP TABLE IF EXISTS [dbo].[rol_permisos];
+DROP TABLE IF EXISTS [dbo].[roles];
+DROP TABLE IF EXISTS [dbo].[permisos];
+DROP TABLE IF EXISTS [dbo].[respuestas_seguridad];
+DROP TABLE IF EXISTS [dbo].[preguntas_seguridad];
+DROP TABLE IF EXISTS [dbo].[password_historial];
+DROP TABLE IF EXISTS [dbo].[usuarios];
+
 CREATE TABLE [dbo].[usuarios] (
     [id_usuario] INT IDENTITY(1,1) NOT NULL,
     [username] VARCHAR(100) NOT NULL,
