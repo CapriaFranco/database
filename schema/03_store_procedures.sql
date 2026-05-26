@@ -396,3 +396,243 @@ BEGIN
     ORDER BY [nombre];
 END;
 GO
+
+-- ==========================================
+-- SP 16: sp_listar_permisos
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_permisos]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        [id_permiso],
+        [codigo],
+        [descripcion],
+        [modulo]
+    FROM [dbo].[permisos]
+    ORDER BY [modulo], [codigo];
+END;
+GO
+
+-- ==========================================
+-- SP 17: sp_listar_roles
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_roles]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        [id_rol],
+        [nombre],
+        [descripcion],
+        [activo]
+    FROM [dbo].[roles]
+    ORDER BY [nombre];
+END;
+GO
+
+-- ==========================================
+-- SP 18: sp_listar_familias
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_familias]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        [id_familia],
+        [nombre],
+        [descripcion],
+        [activo]
+    FROM [dbo].[familias]
+    ORDER BY [nombre];
+END;
+GO
+
+-- ==========================================
+-- SP 19: sp_listar_permisos_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_permisos_usuario]
+    @id_usuario INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        p.[id_permiso],
+        p.[codigo],
+        p.[descripcion],
+        p.[modulo],
+        up.[fecha_asignacion],
+        up.[fecha_expiracion]
+    FROM [dbo].[usuario_permisos] AS up
+    INNER JOIN [dbo].[permisos] AS p
+        ON p.[id_permiso] = up.[id_permiso]
+    WHERE up.[id_usuario] = @id_usuario
+    ORDER BY p.[modulo], p.[codigo];
+END;
+GO
+
+-- ==========================================
+-- SP 20: sp_listar_roles_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_roles_usuario]
+    @id_usuario INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        r.[id_rol],
+        r.[nombre],
+        r.[descripcion],
+        r.[activo],
+        ur.[fecha_asignacion],
+        ur.[fecha_expiracion]
+    FROM [dbo].[usuario_roles] AS ur
+    INNER JOIN [dbo].[roles] AS r
+        ON r.[id_rol] = ur.[id_rol]
+    WHERE ur.[id_usuario] = @id_usuario
+    ORDER BY r.[nombre];
+END;
+GO
+
+-- ==========================================
+-- SP 21: sp_listar_familias_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_familias_usuario]
+    @id_usuario INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        f.[id_familia],
+        f.[nombre],
+        f.[descripcion],
+        f.[activo],
+        uf.[fecha_asignacion],
+        uf.[fecha_expiracion]
+    FROM [dbo].[usuario_familias] AS uf
+    INNER JOIN [dbo].[familias] AS f
+        ON f.[id_familia] = uf.[id_familia]
+    WHERE uf.[id_usuario] = @id_usuario
+    ORDER BY f.[nombre];
+END;
+GO
+
+-- ==========================================
+-- SP 22: sp_asignar_permiso_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_asignar_permiso_usuario]
+    @id_usuario INT,
+    @id_permiso INT,
+    @fecha_asignacion DATETIME2 = NULL,
+    @fecha_expiracion DATETIME2 = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM [dbo].[usuario_permisos]
+        WHERE [id_usuario] = @id_usuario
+          AND [id_permiso] = @id_permiso
+    )
+    BEGIN
+        INSERT INTO [dbo].[usuario_permisos] (
+            [id_usuario],
+            [id_permiso],
+            [fecha_asignacion],
+            [fecha_expiracion]
+        )
+        VALUES (
+            @id_usuario,
+            @id_permiso,
+            COALESCE(@fecha_asignacion, SYSDATETIME()),
+            @fecha_expiracion
+        );
+    END;
+END;
+GO
+
+-- ==========================================
+-- SP 23: sp_asignar_rol_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_asignar_rol_usuario]
+    @id_usuario INT,
+    @id_rol INT,
+    @fecha_asignacion DATETIME2 = NULL,
+    @fecha_expiracion DATETIME2 = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM [dbo].[usuario_roles]
+        WHERE [id_usuario] = @id_usuario
+          AND [id_rol] = @id_rol
+    )
+    BEGIN
+        INSERT INTO [dbo].[usuario_roles] (
+            [id_usuario],
+            [id_rol],
+            [fecha_asignacion],
+            [fecha_expiracion]
+        )
+        VALUES (
+            @id_usuario,
+            @id_rol,
+            COALESCE(@fecha_asignacion, SYSDATETIME()),
+            @fecha_expiracion
+        );
+    END;
+END;
+GO
+
+-- ==========================================
+-- SP 24: sp_asignar_familia_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_asignar_familia_usuario]
+    @id_usuario INT,
+    @id_familia INT,
+    @fecha_asignacion DATETIME2 = NULL,
+    @fecha_expiracion DATETIME2 = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM [dbo].[usuario_familias]
+        WHERE [id_usuario] = @id_usuario
+          AND [id_familia] = @id_familia
+    )
+    BEGIN
+        INSERT INTO [dbo].[usuario_familias] (
+            [id_usuario],
+            [id_familia],
+            [fecha_asignacion],
+            [fecha_expiracion]
+        )
+        VALUES (
+            @id_usuario,
+            @id_familia,
+            COALESCE(@fecha_asignacion, SYSDATETIME()),
+            @fecha_expiracion
+        );
+    END;
+END;
+GO
