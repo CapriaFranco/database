@@ -1,4 +1,11 @@
--- SQL Server 2019 T-SQL conversion from MySQL schema
+-- ==========================================
+-- SCHEMA DEFINICION
+-- ==========================================
+
+USE [theEnterprise7mo2da];
+GO
+
+-- ==========================================
 
 DROP TABLE IF EXISTS [dbo].[proveedor_categoria];
 DROP TABLE IF EXISTS [dbo].[categorias];

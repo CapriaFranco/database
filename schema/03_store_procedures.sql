@@ -1,6 +1,12 @@
 -- ==========================================
 -- SP 1: sp_existen_usuarios
 -- ==========================================
+
+USE [theEnterprise7mo2da];
+GO
+
+-- ==========================================
+
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_existen_usuarios]
 AS
