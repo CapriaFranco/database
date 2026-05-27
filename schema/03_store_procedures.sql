@@ -1283,3 +1283,184 @@ BEGIN
     ORDER BY [tipo_acceso], [nombre_acceso];
 END;
 GO
+
+-- ==========================================
+-- SP 42: sp_guardar_codigo_twofa_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_guardar_codigo_twofa_usuario]
+    @id_usuario INT,
+    @codigo_hash VARCHAR(256),
+    @minutos_vigencia INT = 10,
+    @id_codigo INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @ahora DATETIME2 = SYSDATETIME();
+    DECLARE @fecha_expira DATETIME2 = DATEADD(MINUTE, @minutos_vigencia, @ahora);
+
+    UPDATE [dbo].[usuarios_twofa_codigos]
+    SET [estado] = 'caducado'
+    WHERE [id_usuario] = @id_usuario
+      AND [estado] = 'vigente';
+
+    INSERT INTO [dbo].[usuarios_twofa_codigos]
+        ([id_usuario], [codigo_hash], [fecha_creado], [fecha_expira], [estado])
+    VALUES
+        (@id_usuario, @codigo_hash, @ahora, @fecha_expira, 'vigente');
+
+    SET @id_codigo = SCOPE_IDENTITY();
+
+    SELECT
+        @id_codigo AS [id_codigo],
+        @id_usuario AS [id_usuario],
+        @ahora AS [fecha_creado],
+        @fecha_expira AS [fecha_expira],
+        CAST('vigente' AS NVARCHAR(20)) AS [estado];
+END;
+GO
+
+-- ==========================================
+-- SP 43: sp_obtener_codigos_twofa_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_obtener_codigos_twofa_usuario]
+    @id_usuario INT,
+    @estado NVARCHAR(20) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        c.[id_codigo],
+        c.[id_usuario],
+        c.[codigo_hash],
+        c.[fecha_creado],
+        c.[fecha_expira],
+        c.[estado],
+        c.[fecha_uso],
+        c.[intentos_verificacion]
+    FROM [dbo].[usuarios_twofa_codigos] AS c
+    WHERE c.[id_usuario] = @id_usuario
+      AND (@estado IS NULL OR c.[estado] = @estado)
+    ORDER BY c.[fecha_creado] DESC;
+END;
+GO
+
+-- ==========================================
+-- SP 44: sp_actualizar_estado_codigo_twofa_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_actualizar_estado_codigo_twofa_usuario]
+    @id_codigo INT,
+    @estado NVARCHAR(20),
+    @fecha_uso DATETIME2 = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @fecha_uso_final DATETIME2 = @fecha_uso;
+
+    IF @estado = 'usado' AND @fecha_uso_final IS NULL
+    BEGIN
+        SET @fecha_uso_final = SYSDATETIME();
+    END;
+
+    UPDATE [dbo].[usuarios_twofa_codigos]
+    SET [estado] = @estado,
+        [fecha_uso] = @fecha_uso_final
+    WHERE [id_codigo] = @id_codigo;
+
+    SELECT
+        c.[id_codigo],
+        c.[id_usuario],
+        c.[fecha_creado],
+        c.[fecha_expira],
+        c.[estado],
+        c.[fecha_uso],
+        c.[intentos_verificacion]
+    FROM [dbo].[usuarios_twofa_codigos] AS c
+    WHERE c.[id_codigo] = @id_codigo;
+END;
+GO
+
+-- ==========================================
+-- SP 45: sp_validar_codigo_twofa_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_validar_codigo_twofa_usuario]
+    @id_usuario INT,
+    @codigo_hash VARCHAR(256)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @ahora DATETIME2 = SYSDATETIME();
+    DECLARE @id_codigo INT = NULL;
+    DECLARE @codigo_vigente VARCHAR(256) = NULL;
+    DECLARE @fecha_expira DATETIME2 = NULL;
+
+    SELECT TOP (1)
+        @id_codigo = c.[id_codigo],
+        @codigo_vigente = c.[codigo_hash],
+        @fecha_expira = c.[fecha_expira]
+    FROM [dbo].[usuarios_twofa_codigos] AS c
+    WHERE c.[id_usuario] = @id_usuario
+      AND c.[estado] = 'vigente'
+    ORDER BY c.[fecha_creado] DESC;
+
+    IF @id_codigo IS NULL
+    BEGIN
+        SELECT
+            CAST(0 AS BIT) AS [codigo_valido],
+            CAST(0 AS BIT) AS [codigo_encontrado],
+            CAST(NULL AS INT) AS [id_codigo],
+            CAST(NULL AS DATETIME2) AS [fecha_expira],
+            CAST(NULL AS NVARCHAR(20)) AS [estado];
+        RETURN;
+    END;
+
+    IF @fecha_expira IS NOT NULL AND @fecha_expira < @ahora
+    BEGIN
+        UPDATE [dbo].[usuarios_twofa_codigos]
+        SET [estado] = 'caducado'
+        WHERE [id_codigo] = @id_codigo;
+
+        SELECT
+            CAST(0 AS BIT) AS [codigo_valido],
+            CAST(1 AS BIT) AS [codigo_encontrado],
+            @id_codigo AS [id_codigo],
+            @fecha_expira AS [fecha_expira],
+            CAST('caducado' AS NVARCHAR(20)) AS [estado];
+        RETURN;
+    END;
+
+    IF @codigo_vigente = @codigo_hash
+    BEGIN
+        UPDATE [dbo].[usuarios_twofa_codigos]
+        SET [estado] = 'usado',
+            [fecha_uso] = @ahora
+        WHERE [id_codigo] = @id_codigo;
+
+        SELECT
+            CAST(1 AS BIT) AS [codigo_valido],
+            CAST(1 AS BIT) AS [codigo_encontrado],
+            @id_codigo AS [id_codigo],
+            @fecha_expira AS [fecha_expira],
+            CAST('usado' AS NVARCHAR(20)) AS [estado];
+        RETURN;
+    END;
+
+    UPDATE [dbo].[usuarios_twofa_codigos]
+    SET [intentos_verificacion] = ISNULL([intentos_verificacion], 0) + 1
+    WHERE [id_codigo] = @id_codigo;
+
+    SELECT
+        CAST(0 AS BIT) AS [codigo_valido],
+        CAST(1 AS BIT) AS [codigo_encontrado],
+        @id_codigo AS [id_codigo],
+        @fecha_expira AS [fecha_expira],
+        CAST('vigente' AS NVARCHAR(20)) AS [estado];
+END;
+GO
