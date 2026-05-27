@@ -721,13 +721,51 @@ END;
 GO
 
 -- ==========================================
--- SP 28: sp_guardar_respuesta_seguridad
+-- SP 28: sp_actualizar_estado_pregunta_seguridad
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_actualizar_estado_pregunta_seguridad]
+    @id_pregunta INT,
+    @estado BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE [dbo].[preguntas_seguridad]
+    SET [estado] = @estado
+    WHERE [id_pregunta] = @id_pregunta;
+END;
+GO
+
+-- ==========================================
+-- SP 29: sp_listar_preguntas_seguridad
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_preguntas_seguridad]
+    @solo_activas BIT = 1
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        [id_pregunta],
+        [pregunta],
+        [estado]
+    FROM [dbo].[preguntas_seguridad]
+    WHERE @solo_activas = 0 OR [estado] = 1
+    ORDER BY [pregunta];
+END;
+GO
+
+-- ==========================================
+-- SP 30: sp_guardar_respuesta_seguridad
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_guardar_respuesta_seguridad]
     @id_usuario INT,
     @id_pregunta INT,
-    @respuesta_hash VARCHAR(256)
+    @respuesta_hash VARCHAR(256),
+    @pista VARCHAR(256) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -744,7 +782,8 @@ BEGIN
         )
         BEGIN
             UPDATE [dbo].[respuestas_seguridad]
-            SET [respuesta_hash] = @respuesta_hash
+            SET [respuesta_hash] = @respuesta_hash,
+                [pista] = @pista
             WHERE [id_usuario] = @id_usuario
               AND [id_pregunta] = @id_pregunta;
         END
@@ -753,12 +792,14 @@ BEGIN
             INSERT INTO [dbo].[respuestas_seguridad] (
                 [id_usuario],
                 [id_pregunta],
-                [respuesta_hash]
+                [respuesta_hash],
+                [pista]
             )
             VALUES (
                 @id_usuario,
                 @id_pregunta,
-                @respuesta_hash
+                @respuesta_hash,
+                @pista
             );
         END;
 
@@ -774,7 +815,7 @@ END;
 GO
 
 -- ==========================================
--- SP 29: sp_actualizar_requiere_cambio_pass
+-- SP 31: sp_actualizar_requiere_cambio_pass
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_actualizar_requiere_cambio_pass]
@@ -791,7 +832,50 @@ END;
 GO
 
 -- ==========================================
--- SP 30: sp_obtener_entidad
+-- SP 32: sp_cambiar_password_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_cambiar_password_usuario]
+    @id_usuario INT,
+    @password_hash_nuevo VARCHAR(256),
+    @requiere_cambio_pass BIT = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        INSERT INTO [dbo].[password_historial] (
+            [id_usuario],
+            [password_hash]
+        )
+        VALUES (
+            @id_usuario,
+            @password_hash_nuevo
+        );
+
+        UPDATE [dbo].[usuarios]
+        SET [password_hash] = @password_hash_nuevo,
+            [requiere_cambio_pass] = @requiere_cambio_pass,
+            [intentos_fallidos] = 0,
+            [bloqueado_hasta] = NULL
+        WHERE [id_usuario] = @id_usuario;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        THROW;
+    END CATCH
+END;
+GO
+
+-- ==========================================
+-- SP 33: sp_obtener_entidad
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_obtener_entidad]
@@ -810,7 +894,7 @@ END;
 GO
 
 -- ==========================================
--- SP 31: sp_obtener_fisica
+-- SP 34: sp_obtener_fisica
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_obtener_fisica]
@@ -831,7 +915,7 @@ END;
 GO
 
 -- ==========================================
--- SP 32: sp_obtener_usuario
+-- SP 35: sp_obtener_usuario
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_obtener_usuario]
@@ -859,7 +943,7 @@ END;
 GO
 
 -- ==========================================
--- SP 33: sp_listar_documentos_entidad
+-- SP 36: sp_listar_documentos_entidad
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_listar_documentos_entidad]
@@ -884,7 +968,7 @@ END;
 GO
 
 -- ==========================================
--- SP 34: sp_listar_contactos_entidad
+-- SP 37: sp_listar_contactos_entidad
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_listar_contactos_entidad]
@@ -910,7 +994,7 @@ END;
 GO
 
 -- ==========================================
--- SP 35: sp_listar_domicilios_entidad
+-- SP 38: sp_listar_domicilios_entidad
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_listar_domicilios_entidad]
@@ -946,7 +1030,7 @@ END;
 GO
 
 -- ==========================================
--- SP 36: sp_listar_preguntas_seguridad_usuario
+-- SP 39: sp_listar_preguntas_seguridad_usuario
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_listar_preguntas_seguridad_usuario]
@@ -960,7 +1044,9 @@ BEGIN
         rs.[id_usuario],
         rs.[id_pregunta],
         ps.[pregunta],
-        rs.[respuesta_hash]
+        rs.[respuesta_hash],
+        rs.[pista],
+        ps.[estado]
     FROM [dbo].[respuestas_seguridad] AS rs
     INNER JOIN [dbo].[preguntas_seguridad] AS ps
         ON ps.[id_pregunta] = rs.[id_pregunta]
@@ -970,7 +1056,7 @@ END;
 GO
 
 -- ==========================================
--- SP 37: sp_login_usuario
+-- SP 40: sp_login_usuario
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_login_usuario]
@@ -979,23 +1065,221 @@ CREATE OR ALTER PROCEDURE [dbo].[sp_login_usuario]
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    DECLARE @id_usuario INT = NULL;
+    DECLARE @username VARCHAR(100) = NULL;
+    DECLARE @email VARCHAR(256) = NULL;
+    DECLARE @estado NVARCHAR(50) = NULL;
+    DECLARE @requiere_cambio_pass BIT = NULL;
+    DECLARE @intentos_fallidos INT = NULL;
+    DECLARE @bloqueado_hasta DATETIME2 = NULL;
+    DECLARE @ultimo_login DATETIME2 = NULL;
+    DECLARE @fecha_alta DATETIME2 = NULL;
+    DECLARE @idioma_iso VARCHAR(5) = NULL;
+    DECLARE @twofa_habilitado BIT = NULL;
+    DECLARE @password_hash_db VARCHAR(256) = NULL;
+    DECLARE @login_intentos_max INT = COALESCE((SELECT TOP (1) [login_intentos_max] FROM [dbo].[configuracion_sistema] WHERE [id_config] = 1), 6);
+    DECLARE @login_bloqueo_minutos INT = COALESCE((SELECT TOP (1) [login_bloqueo_minutos] FROM [dbo].[configuracion_sistema] WHERE [id_config] = 1), 15);
+    DECLARE @ahora DATETIME2 = SYSDATETIME();
+    DECLARE @password_correcta BIT = 0;
+    DECLARE @usuario_encontrado BIT = 0;
+    DECLARE @login_valido BIT = 0;
+    DECLARE @bloqueado BIT = 0;
 
     SELECT TOP (1)
-        u.[id_usuario],
-        u.[username],
-        u.[email],
-        u.[estado],
-        u.[requiere_cambio_pass],
-        u.[intentos_fallidos],
-        u.[bloqueado_hasta],
-        u.[ultimo_login],
-        u.[fecha_alta],
-        u.[idioma_iso],
-        u.[twofa_habilitado]
+        @id_usuario = u.[id_usuario],
+        @username = u.[username],
+        @email = u.[email],
+        @estado = u.[estado],
+        @requiere_cambio_pass = u.[requiere_cambio_pass],
+        @intentos_fallidos = u.[intentos_fallidos],
+        @bloqueado_hasta = u.[bloqueado_hasta],
+        @ultimo_login = u.[ultimo_login],
+        @fecha_alta = u.[fecha_alta],
+        @idioma_iso = u.[idioma_iso],
+        @twofa_habilitado = u.[twofa_habilitado],
+        @password_hash_db = u.[password_hash]
     FROM [dbo].[usuarios] AS u
-    WHERE (u.[username] = @usuario_o_email OR u.[email] = @usuario_o_email)
-      AND u.[password_hash] = @password_hash
-      AND u.[estado] = N'activo'
-      AND (u.[bloqueado_hasta] IS NULL OR u.[bloqueado_hasta] <= SYSDATETIME());
+    WHERE u.[username] = @usuario_o_email
+       OR u.[email] = @usuario_o_email;
+
+    IF @id_usuario IS NULL
+    BEGIN
+        SELECT
+            CAST(0 AS BIT) AS [login_valido],
+            CAST(0 AS BIT) AS [usuario_encontrado],
+            CAST(0 AS BIT) AS [password_correcta],
+            CAST(NULL AS INT) AS [id_usuario],
+            CAST(NULL AS VARCHAR(100)) AS [username],
+            CAST(NULL AS VARCHAR(256)) AS [email],
+            CAST(NULL AS NVARCHAR(50)) AS [estado],
+            CAST(NULL AS BIT) AS [requiere_cambio_pass],
+            CAST(NULL AS INT) AS [intentos_fallidos],
+            CAST(NULL AS DATETIME2) AS [bloqueado_hasta],
+            CAST(NULL AS DATETIME2) AS [ultimo_login],
+            CAST(NULL AS DATETIME2) AS [fecha_alta],
+            CAST(NULL AS VARCHAR(5)) AS [idioma_iso],
+            CAST(NULL AS BIT) AS [twofa_habilitado];
+        RETURN;
+    END;
+
+    SET @usuario_encontrado = 1;
+
+    IF @estado <> N'activo'
+    BEGIN
+        SELECT
+            CAST(0 AS BIT) AS [login_valido],
+            CAST(1 AS BIT) AS [usuario_encontrado],
+            CAST(0 AS BIT) AS [password_correcta],
+            @id_usuario AS [id_usuario],
+            @username AS [username],
+            @email AS [email],
+            @estado AS [estado],
+            @requiere_cambio_pass AS [requiere_cambio_pass],
+            @intentos_fallidos AS [intentos_fallidos],
+            @bloqueado_hasta AS [bloqueado_hasta],
+            @ultimo_login AS [ultimo_login],
+            @fecha_alta AS [fecha_alta],
+            @idioma_iso AS [idioma_iso],
+            @twofa_habilitado AS [twofa_habilitado];
+        RETURN;
+    END;
+
+    IF @bloqueado_hasta IS NOT NULL AND @bloqueado_hasta > @ahora
+    BEGIN
+        SET @bloqueado = 1;
+
+        SELECT
+            CAST(0 AS BIT) AS [login_valido],
+            CAST(1 AS BIT) AS [usuario_encontrado],
+            CAST(0 AS BIT) AS [password_correcta],
+            @id_usuario AS [id_usuario],
+            @username AS [username],
+            @email AS [email],
+            @estado AS [estado],
+            @requiere_cambio_pass AS [requiere_cambio_pass],
+            @intentos_fallidos AS [intentos_fallidos],
+            @bloqueado_hasta AS [bloqueado_hasta],
+            @ultimo_login AS [ultimo_login],
+            @fecha_alta AS [fecha_alta],
+            @idioma_iso AS [idioma_iso],
+            @twofa_habilitado AS [twofa_habilitado];
+        RETURN;
+    END;
+
+    IF @password_hash_db = @password_hash
+    BEGIN
+        SET @password_correcta = 1;
+        SET @login_valido = 1;
+        SET @intentos_fallidos = 0;
+        SET @bloqueado_hasta = NULL;
+
+        UPDATE [dbo].[usuarios]
+        SET [intentos_fallidos] = 0,
+            [bloqueado_hasta] = NULL,
+            [ultimo_login] = @ahora
+        WHERE [id_usuario] = @id_usuario;
+
+        SELECT
+            CAST(1 AS BIT) AS [login_valido],
+            CAST(1 AS BIT) AS [usuario_encontrado],
+            CAST(1 AS BIT) AS [password_correcta],
+            @id_usuario AS [id_usuario],
+            @username AS [username],
+            @email AS [email],
+            @estado AS [estado],
+            @requiere_cambio_pass AS [requiere_cambio_pass],
+            @intentos_fallidos AS [intentos_fallidos],
+            @bloqueado_hasta AS [bloqueado_hasta],
+            @ahora AS [ultimo_login],
+            @fecha_alta AS [fecha_alta],
+            @idioma_iso AS [idioma_iso],
+            @twofa_habilitado AS [twofa_habilitado];
+        RETURN;
+    END;
+
+    SET @intentos_fallidos = ISNULL(@intentos_fallidos, 0) + 1;
+    SET @bloqueado_hasta = CASE
+        WHEN @intentos_fallidos >= @login_intentos_max THEN DATEADD(MINUTE, @login_bloqueo_minutos, @ahora)
+        ELSE NULL
+    END;
+
+    UPDATE [dbo].[usuarios]
+    SET [intentos_fallidos] = @intentos_fallidos,
+        [bloqueado_hasta] = @bloqueado_hasta
+    WHERE [id_usuario] = @id_usuario;
+
+    SELECT
+        CAST(0 AS BIT) AS [login_valido],
+        CAST(1 AS BIT) AS [usuario_encontrado],
+        CAST(0 AS BIT) AS [password_correcta],
+        @id_usuario AS [id_usuario],
+        @username AS [username],
+        @email AS [email],
+        @estado AS [estado],
+        @requiere_cambio_pass AS [requiere_cambio_pass],
+        @intentos_fallidos AS [intentos_fallidos],
+        @bloqueado_hasta AS [bloqueado_hasta],
+        @ultimo_login AS [ultimo_login],
+        @fecha_alta AS [fecha_alta],
+        @idioma_iso AS [idioma_iso],
+        @twofa_habilitado AS [twofa_habilitado];
+END;
+GO
+
+-- ==========================================
+-- SP 41: sp_resumen_accesos_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_resumen_accesos_usuario]
+    @id_usuario INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        CAST('familia' AS VARCHAR(20)) AS [tipo_acceso],
+        f.[id_familia] AS [id_acceso],
+        f.[nombre] AS [nombre_acceso],
+        f.[descripcion],
+        f.[activo],
+        uf.[fecha_asignacion],
+        uf.[fecha_expiracion]
+    FROM [dbo].[usuario_familias] AS uf
+    INNER JOIN [dbo].[familias] AS f
+        ON f.[id_familia] = uf.[id_familia]
+    WHERE uf.[id_usuario] = @id_usuario
+
+    UNION ALL
+
+    SELECT
+        CAST('rol' AS VARCHAR(20)) AS [tipo_acceso],
+        r.[id_rol] AS [id_acceso],
+        r.[nombre] AS [nombre_acceso],
+        r.[descripcion],
+        r.[activo],
+        ur.[fecha_asignacion],
+        ur.[fecha_expiracion]
+    FROM [dbo].[usuario_roles] AS ur
+    INNER JOIN [dbo].[roles] AS r
+        ON r.[id_rol] = ur.[id_rol]
+    WHERE ur.[id_usuario] = @id_usuario
+
+    UNION ALL
+
+    SELECT
+        CAST('permiso' AS VARCHAR(20)) AS [tipo_acceso],
+        p.[id_permiso] AS [id_acceso],
+        p.[codigo] AS [nombre_acceso],
+        p.[descripcion],
+        CAST(1 AS BIT) AS [activo],
+        up.[fecha_asignacion],
+        up.[fecha_expiracion]
+    FROM [dbo].[usuario_permisos] AS up
+    INNER JOIN [dbo].[permisos] AS p
+        ON p.[id_permiso] = up.[id_permiso]
+    WHERE up.[id_usuario] = @id_usuario
+    ORDER BY [tipo_acceso], [nombre_acceso];
 END;
 GO
