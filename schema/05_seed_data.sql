@@ -281,6 +281,100 @@ BEGIN
 END;
 
 -- ==========================================
+-- PREGUNTAS DE SEGURIDAD
+-- ==========================================
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál fue el nombre de tu primera mascota?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál fue el nombre de tu primera mascota?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál es tu comida favorita?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál es tu comida favorita?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cómo se llamaba tu mejor amigo de la infancia?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cómo se llamaba tu mejor amigo de la infancia?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿En qué ciudad naciste?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿En qué ciudad naciste?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál era el nombre de tu escuela primaria?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál era el nombre de tu escuela primaria?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál es el segundo nombre de tu madre?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál es el segundo nombre de tu madre?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál es el apellido de soltera de tu madre?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál es el apellido de soltera de tu madre?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál fue tu primer auto?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál fue tu primer auto?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál es tu libro favorito?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál es tu libro favorito?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál era tu apodo de niño?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál era tu apodo de niño?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cómo se llamaba tu primera maestra?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cómo se llamaba tu primera maestra?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál es tu color favorito?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál es tu color favorito?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿En qué barrio viviste de chico?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿En qué barrio viviste de chico?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál fue el nombre de tu primer jefe?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál fue el nombre de tu primer jefe?', 1);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[preguntas_seguridad] WHERE [pregunta] = '¿Cuál es tu película favorita?')
+BEGIN
+    INSERT INTO [dbo].[preguntas_seguridad] ([pregunta], [estado])
+    VALUES ('¿Cuál es tu película favorita?', 1);
+END;
+
+-- ==========================================
 -- TIPOS DE CONTACTO
 -- ==========================================
 

@@ -78,6 +78,7 @@ CREATE INDEX [idx_ph_usuario] ON [dbo].[password_historial] ([id_usuario]);
 CREATE TABLE [dbo].[preguntas_seguridad] (
     [id_pregunta] INT IDENTITY(1,1) NOT NULL,
     [pregunta] VARCHAR(255) NOT NULL,
+    [estado] BIT NOT NULL CONSTRAINT [DF_preguntas_seguridad_estado] DEFAULT (1),
     CONSTRAINT [PK_preguntas_seguridad] PRIMARY KEY ([id_pregunta])
 );
 
@@ -86,6 +87,7 @@ CREATE TABLE [dbo].[respuestas_seguridad] (
     [id_usuario] INT NOT NULL,
     [id_pregunta] INT NOT NULL,
     [respuesta_hash] VARCHAR(256) NOT NULL,
+    [pista] VARCHAR(256) NULL,
     CONSTRAINT [PK_respuestas_seguridad] PRIMARY KEY ([id]),
     CONSTRAINT [UQ_respuestas_seguridad_usuario_pregunta] UNIQUE ([id_usuario], [id_pregunta]),
     CONSTRAINT [FK_respuestas_seguridad_usuarios] FOREIGN KEY ([id_usuario]) REFERENCES [dbo].[usuarios] ([id_usuario]) ON DELETE CASCADE,
@@ -172,10 +174,10 @@ CREATE TABLE [dbo].[fisicas] (
     [fecha_nacimiento] DATE NULL,
     [id_usuario] INT NULL,
     CONSTRAINT [PK_fisicas] PRIMARY KEY ([id_entidad]),
-    CONSTRAINT [UQ_fisicas_id_usuario] UNIQUE ([id_usuario]),
     CONSTRAINT [FK_fisicas_entidades] FOREIGN KEY ([id_entidad]) REFERENCES [dbo].[entidades] ([id_entidad]) ON DELETE CASCADE,
     CONSTRAINT [FK_fisicas_usuarios] FOREIGN KEY ([id_usuario]) REFERENCES [dbo].[usuarios] ([id_usuario]) ON DELETE SET NULL
 );
+CREATE UNIQUE INDEX [UX_fisicas_id_usuario] ON [dbo].[fisicas] ([id_usuario]) WHERE [id_usuario] IS NOT NULL;
 
 CREATE TABLE [dbo].[tipo_social] (
     [id_tipo_social] INT IDENTITY(1,1) NOT NULL,
