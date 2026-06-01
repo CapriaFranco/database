@@ -80,6 +80,12 @@ BEGIN
     VALUES ('ADMIN', 'Familia administrativa principal del sistema', 1);
 END;
 
+IF NOT EXISTS (SELECT 1 FROM [dbo].[familias] WHERE [nombre] = 'USER')
+BEGIN
+    INSERT INTO [dbo].[familias] ([nombre], [descripcion], [activo])
+    VALUES ('USER', 'Familia base de usuarios del sistema', 1);
+END;
+
 -- ==========================================
 -- RELACIONES ENTRE FAMILIAS Y ROLES
 -- ==========================================

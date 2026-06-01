@@ -1,4 +1,14 @@
 -- ==========================================
+-- STORED PROCEDURES
+-- Base de datos: theEnterprise7mo2da
+-- Compatibilidad: SQL Server 2016+ / SSMS 19
+-- Uso: CREATE OR ALTER (idempotente, no requiere DROP previo)
+-- ==========================================
+
+USE [theEnterprise7mo2da];
+GO
+
+-- ==========================================
 -- SP 1: sp_existen_usuarios
 -- ==========================================
 GO
@@ -11,7 +21,7 @@ BEGIN
         SELECT 1
         FROM [dbo].[usuarios]
     ) THEN 1 ELSE 0 END AS BIT) AS [existen_usuarios];
-END;
+END
 GO
 
 -- ==========================================
@@ -29,7 +39,7 @@ BEGIN
     VALUES (@activo);
 
     SET @id_entidad = CAST(SCOPE_IDENTITY() AS INT);
-END;
+END
 GO
 
 -- ==========================================
@@ -60,7 +70,7 @@ BEGIN
         @fecha_nacimiento,
         @id_usuario
     );
-END;
+END
 GO
 
 -- ==========================================
@@ -132,7 +142,7 @@ BEGIN
 
         THROW;
     END CATCH
-END;
+END
 GO
 
 -- ==========================================
@@ -180,7 +190,7 @@ BEGIN
 
         THROW;
     END CATCH
-END;
+END
 GO
 
 -- ==========================================
@@ -211,7 +221,7 @@ BEGIN
     );
 
     SET @id_documento = CAST(SCOPE_IDENTITY() AS INT);
-END;
+END
 GO
 
 -- ==========================================
@@ -245,7 +255,7 @@ BEGIN
     );
 
     SET @id_contacto = CAST(SCOPE_IDENTITY() AS INT);
-END;
+END
 GO
 
 -- ==========================================
@@ -291,7 +301,7 @@ BEGIN
     );
 
     SET @id_domicilio = CAST(SCOPE_IDENTITY() AS INT);
-END;
+END
 GO
 
 -- ==========================================
@@ -309,7 +319,7 @@ BEGIN
         [codigo]
     FROM [dbo].[paises]
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -329,7 +339,7 @@ BEGIN
     FROM [dbo].[provincias]
     WHERE @id_pais IS NULL OR [id_pais] = @id_pais
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -350,7 +360,7 @@ BEGIN
     FROM [dbo].[localidades]
     WHERE @id_provincia IS NULL OR [id_provincia] = @id_provincia
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -368,7 +378,7 @@ BEGIN
         [aplica_a]
     FROM [dbo].[tipo_documento]
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -385,7 +395,7 @@ BEGIN
         [nombre]
     FROM [dbo].[tipo_contacto]
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -402,7 +412,7 @@ BEGIN
         [nombre]
     FROM [dbo].[entidad_tipo]
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -419,7 +429,7 @@ BEGIN
         [nombre]
     FROM [dbo].[tipo_metodo_pago]
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -436,7 +446,7 @@ BEGIN
         [nombre]
     FROM [dbo].[tipo_social]
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -455,7 +465,7 @@ BEGIN
         [modulo]
     FROM [dbo].[permisos]
     ORDER BY [modulo], [codigo];
-END;
+END
 GO
 
 -- ==========================================
@@ -474,7 +484,7 @@ BEGIN
         [activo]
     FROM [dbo].[roles]
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -493,7 +503,7 @@ BEGIN
         [activo]
     FROM [dbo].[familias]
     ORDER BY [nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -518,7 +528,7 @@ BEGIN
         ON p.[id_permiso] = up.[id_permiso]
     WHERE up.[id_usuario] = @id_usuario
     ORDER BY p.[modulo], p.[codigo];
-END;
+END
 GO
 
 -- ==========================================
@@ -543,7 +553,7 @@ BEGIN
         ON r.[id_rol] = ur.[id_rol]
     WHERE ur.[id_usuario] = @id_usuario
     ORDER BY r.[nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -568,7 +578,7 @@ BEGIN
         ON f.[id_familia] = uf.[id_familia]
     WHERE uf.[id_usuario] = @id_usuario
     ORDER BY f.[nombre];
-END;
+END
 GO
 
 -- ==========================================
@@ -604,7 +614,7 @@ BEGIN
             @fecha_expiracion
         );
     END;
-END;
+END
 GO
 
 -- ==========================================
@@ -640,7 +650,7 @@ BEGIN
             @fecha_expiracion
         );
     END;
-END;
+END
 GO
 
 -- ==========================================
@@ -676,7 +686,7 @@ BEGIN
             @fecha_expiracion
         );
     END;
-END;
+END
 GO
 
 -- ==========================================
@@ -699,7 +709,7 @@ BEGIN
             ELSE 1
         END
     AS BIT) AS [es_primera_password];
-END;
+END
 GO
 
 -- ==========================================
@@ -717,7 +727,7 @@ BEGIN
     VALUES (@pregunta);
 
     SET @id_pregunta = CAST(SCOPE_IDENTITY() AS INT);
-END;
+END
 GO
 
 -- ==========================================
@@ -734,7 +744,7 @@ BEGIN
     UPDATE [dbo].[preguntas_seguridad]
     SET [estado] = @estado
     WHERE [id_pregunta] = @id_pregunta;
-END;
+END
 GO
 
 -- ==========================================
@@ -754,7 +764,7 @@ BEGIN
     FROM [dbo].[preguntas_seguridad]
     WHERE @solo_activas = 0 OR [estado] = 1
     ORDER BY [pregunta];
-END;
+END
 GO
 
 -- ==========================================
@@ -811,7 +821,7 @@ BEGIN
 
         THROW;
     END CATCH
-END;
+END
 GO
 
 -- ==========================================
@@ -828,7 +838,7 @@ BEGIN
     UPDATE [dbo].[usuarios]
     SET [requiere_cambio_pass] = @requiere_cambio_pass
     WHERE [id_usuario] = @id_usuario;
-END;
+END
 GO
 
 -- ==========================================
@@ -871,7 +881,7 @@ BEGIN
 
         THROW;
     END CATCH
-END;
+END
 GO
 
 -- ==========================================
@@ -890,7 +900,7 @@ BEGIN
         e.[fecha_alta]
     FROM [dbo].[entidades] AS e
     WHERE e.[id_entidad] = @id_entidad;
-END;
+END
 GO
 
 -- ==========================================
@@ -911,7 +921,7 @@ BEGIN
         f.[id_usuario]
     FROM [dbo].[fisicas] AS f
     WHERE f.[id_entidad] = @id_entidad;
-END;
+END
 GO
 
 -- ==========================================
@@ -939,7 +949,7 @@ BEGIN
         u.[twofa_habilitado]
     FROM [dbo].[usuarios] AS u
     WHERE u.[id_usuario] = @id_usuario;
-END;
+END
 GO
 
 -- ==========================================
@@ -964,7 +974,7 @@ BEGIN
         ON td.[id_tipo_documento] = d.[id_tipo_documento]
     WHERE d.[id_entidad] = @id_entidad
     ORDER BY d.[es_principal] DESC, td.[nombre], d.[valor];
-END;
+END
 GO
 
 -- ==========================================
@@ -990,7 +1000,7 @@ BEGIN
         ON tc.[id_tipo_contacto] = c.[id_tipo_contacto]
     WHERE c.[id_entidad] = @id_entidad
     ORDER BY c.[es_principal] DESC, tc.[nombre], c.[valor];
-END;
+END
 GO
 
 -- ==========================================
@@ -1026,7 +1036,7 @@ BEGIN
         ON pa.[id_pais] = p.[id_pais]
     WHERE dom.[id_entidad] = @id_entidad
     ORDER BY dom.[es_principal] DESC, pa.[nombre], p.[nombre], l.[nombre], dom.[calle];
-END;
+END
 GO
 
 -- ==========================================
@@ -1052,11 +1062,12 @@ BEGIN
         ON ps.[id_pregunta] = rs.[id_pregunta]
     WHERE rs.[id_usuario] = @id_usuario
     ORDER BY ps.[pregunta];
-END;
+END
 GO
 
 -- ==========================================
 -- SP 40: sp_login_usuario
+-- FIX: agregado TRY/CATCH + XACT_ABORT para los UPDATE que modifica datos
 -- ==========================================
 GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_login_usuario]
@@ -1102,8 +1113,10 @@ BEGIN
         @password_hash_db = u.[password_hash]
     FROM [dbo].[usuarios] AS u
     WHERE u.[username] = @usuario_o_email
-       OR u.[email] = @usuario_o_email;
+       OR u.[email] = @usuario_o_email
+    ORDER BY CASE WHEN u.[username] = @usuario_o_email THEN 0 ELSE 1 END, u.[id_usuario];
 
+    -- Usuario no encontrado
     IF @id_usuario IS NULL
     BEGIN
         SELECT
@@ -1126,6 +1139,7 @@ BEGIN
 
     SET @usuario_encontrado = 1;
 
+    -- Usuario inactivo / bloqueado / suspendido
     IF @estado <> N'activo'
     BEGIN
         SELECT
@@ -1146,6 +1160,7 @@ BEGIN
         RETURN;
     END;
 
+    -- Cuenta temporalmente bloqueada por intentos
     IF @bloqueado_hasta IS NOT NULL AND @bloqueado_hasta > @ahora
     BEGIN
         SET @bloqueado = 1;
@@ -1168,6 +1183,7 @@ BEGIN
         RETURN;
     END;
 
+    -- Password correcta: login exitoso
     IF @password_hash_db = @password_hash
     BEGIN
         SET @password_correcta = 1;
@@ -1175,11 +1191,16 @@ BEGIN
         SET @intentos_fallidos = 0;
         SET @bloqueado_hasta = NULL;
 
-        UPDATE [dbo].[usuarios]
-        SET [intentos_fallidos] = 0,
-            [bloqueado_hasta] = NULL,
-            [ultimo_login] = @ahora
-        WHERE [id_usuario] = @id_usuario;
+        BEGIN TRY
+            UPDATE [dbo].[usuarios]
+            SET [intentos_fallidos] = 0,
+                [bloqueado_hasta] = NULL,
+                [ultimo_login] = @ahora
+            WHERE [id_usuario] = @id_usuario;
+        END TRY
+        BEGIN CATCH
+            THROW;
+        END CATCH;
 
         SELECT
             CAST(1 AS BIT) AS [login_valido],
@@ -1199,16 +1220,22 @@ BEGIN
         RETURN;
     END;
 
+    -- Password incorrecta: incrementar intentos y bloquear si corresponde
     SET @intentos_fallidos = ISNULL(@intentos_fallidos, 0) + 1;
     SET @bloqueado_hasta = CASE
         WHEN @intentos_fallidos >= @login_intentos_max THEN DATEADD(MINUTE, @login_bloqueo_minutos, @ahora)
         ELSE NULL
     END;
 
-    UPDATE [dbo].[usuarios]
-    SET [intentos_fallidos] = @intentos_fallidos,
-        [bloqueado_hasta] = @bloqueado_hasta
-    WHERE [id_usuario] = @id_usuario;
+    BEGIN TRY
+        UPDATE [dbo].[usuarios]
+        SET [intentos_fallidos] = @intentos_fallidos,
+            [bloqueado_hasta] = @bloqueado_hasta
+        WHERE [id_usuario] = @id_usuario;
+    END TRY
+    BEGIN CATCH
+        THROW;
+    END CATCH;
 
     SELECT
         CAST(0 AS BIT) AS [login_valido],
@@ -1225,7 +1252,7 @@ BEGIN
         @fecha_alta AS [fecha_alta],
         @idioma_iso AS [idioma_iso],
         @twofa_habilitado AS [twofa_habilitado];
-END;
+END
 GO
 
 -- ==========================================
@@ -1280,8 +1307,9 @@ BEGIN
     INNER JOIN [dbo].[permisos] AS p
         ON p.[id_permiso] = up.[id_permiso]
     WHERE up.[id_usuario] = @id_usuario
+
     ORDER BY [tipo_acceso], [nombre_acceso];
-END;
+END
 GO
 
 -- ==========================================
@@ -1291,14 +1319,19 @@ GO
 CREATE OR ALTER PROCEDURE [dbo].[sp_guardar_codigo_twofa_usuario]
     @id_usuario INT,
     @codigo_hash VARCHAR(256),
-    @minutos_vigencia INT = 10,
+    @minutos_vigencia INT = NULL,
     @id_codigo INT OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
 
     DECLARE @ahora DATETIME2 = SYSDATETIME();
-    DECLARE @fecha_expira DATETIME2 = DATEADD(MINUTE, @minutos_vigencia, @ahora);
+    DECLARE @vigencia_minutos INT = COALESCE(
+        @minutos_vigencia,
+        (SELECT TOP (1) [twofa_expiracion_min] FROM [dbo].[configuracion_sistema] WHERE [id_config] = 1),
+        10
+    );
+    DECLARE @fecha_expira DATETIME2 = DATEADD(MINUTE, @vigencia_minutos, @ahora);
 
     UPDATE [dbo].[usuarios_twofa_codigos]
     SET [estado] = 'caducado'
@@ -1310,7 +1343,7 @@ BEGIN
     VALUES
         (@id_usuario, @codigo_hash, @ahora, @fecha_expira, 'vigente');
 
-    SET @id_codigo = SCOPE_IDENTITY();
+    SET @id_codigo = CAST(SCOPE_IDENTITY() AS INT);
 
     SELECT
         @id_codigo AS [id_codigo],
@@ -1318,7 +1351,7 @@ BEGIN
         @ahora AS [fecha_creado],
         @fecha_expira AS [fecha_expira],
         CAST('vigente' AS NVARCHAR(20)) AS [estado];
-END;
+END
 GO
 
 -- ==========================================
@@ -1345,7 +1378,7 @@ BEGIN
     WHERE c.[id_usuario] = @id_usuario
       AND (@estado IS NULL OR c.[estado] = @estado)
     ORDER BY c.[fecha_creado] DESC;
-END;
+END
 GO
 
 -- ==========================================
@@ -1382,7 +1415,7 @@ BEGIN
         c.[intentos_verificacion]
     FROM [dbo].[usuarios_twofa_codigos] AS c
     WHERE c.[id_codigo] = @id_codigo;
-END;
+END
 GO
 
 -- ==========================================
@@ -1462,5 +1495,640 @@ BEGIN
         @id_codigo AS [id_codigo],
         @fecha_expira AS [fecha_expira],
         CAST('vigente' AS NVARCHAR(20)) AS [estado];
-END;
+END
 GO
+
+-- ==========================================
+-- SP 46: sp_listar_fisicas_sin_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_fisicas_sin_usuario]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        f.[id_entidad],
+        f.[nombre],
+        f.[apellido],
+        f.[fecha_nacimiento],
+        CONCAT(f.[apellido], ', ', f.[nombre]) AS [nombre_completo]
+    FROM [dbo].[fisicas] AS f
+    WHERE f.[id_usuario] IS NULL
+    ORDER BY f.[apellido], f.[nombre];
+END
+GO
+
+-- ==========================================
+-- SP 47: sp_listar_contactos_mail_entidad
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_contactos_mail_entidad]
+    @id_entidad INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        c.[id_contacto],
+        c.[id_entidad],
+        c.[id_tipo_contacto],
+        tc.[nombre] AS [tipo_contacto],
+        c.[valor],
+        c.[etiqueta],
+        c.[es_principal]
+    FROM [dbo].[contactos] AS c
+    INNER JOIN [dbo].[tipo_contacto] AS tc
+        ON tc.[id_tipo_contacto] = c.[id_tipo_contacto]
+    WHERE c.[id_entidad] = @id_entidad
+      AND EXISTS (
+          SELECT 1
+          FROM [dbo].[fisicas] AS f
+          WHERE f.[id_entidad] = c.[id_entidad]
+            AND f.[id_usuario] IS NULL
+      )
+      AND LOWER(tc.[nombre]) IN ('mail', 'email')
+    ORDER BY c.[es_principal] DESC, c.[valor];
+END
+GO
+
+-- ==========================================
+-- SP 48: sp_listar_usuarios
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_usuarios]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        u.[id_usuario],
+        u.[username],
+        u.[email],
+        u.[estado],
+        u.[fecha_alta],
+        f.[id_entidad] AS [id_fisica],
+        CONCAT(f.[apellido], ', ', f.[nombre]) AS [nombre_completo],
+        rol_principal.[nombre] AS [rol_principal],
+        fam_principal.[nombre] AS [familia_principal],
+        u.[twofa_habilitado],
+        u.[bloqueado_hasta],
+        u.[ultimo_login]
+    FROM [dbo].[usuarios] AS u
+    LEFT JOIN [dbo].[fisicas] AS f
+        ON f.[id_usuario] = u.[id_usuario]
+    OUTER APPLY (
+        SELECT TOP (1)
+            r.[nombre]
+        FROM [dbo].[usuario_roles] AS ur
+        INNER JOIN [dbo].[roles] AS r
+            ON r.[id_rol] = ur.[id_rol]
+        WHERE ur.[id_usuario] = u.[id_usuario]
+        ORDER BY ur.[fecha_asignacion] DESC, ur.[id_rol]
+    ) AS rol_principal
+    OUTER APPLY (
+        SELECT TOP (1)
+            fa.[nombre]
+        FROM [dbo].[usuario_familias] AS uf
+        INNER JOIN [dbo].[familias] AS fa
+            ON fa.[id_familia] = uf.[id_familia]
+        WHERE uf.[id_usuario] = u.[id_usuario]
+        ORDER BY uf.[fecha_asignacion] DESC, uf.[id_familia]
+    ) AS fam_principal
+    ORDER BY u.[fecha_alta] DESC, u.[username];
+END
+GO
+
+-- ==========================================
+-- SP 49: sp_obtener_usuario_detalle
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_obtener_usuario_detalle]
+    @id_usuario INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Datos basicos del usuario + fisica asociada
+    SELECT
+        u.[id_usuario],
+        u.[username],
+        u.[email],
+        u.[estado],
+        u.[requiere_cambio_pass],
+        u.[intentos_fallidos],
+        u.[bloqueado_hasta],
+        u.[ultimo_login],
+        u.[fecha_alta],
+        u.[idioma_iso],
+        u.[twofa_habilitado],
+        f.[id_entidad] AS [id_fisica],
+        f.[nombre],
+        f.[apellido],
+        CONCAT(f.[apellido], ', ', f.[nombre]) AS [nombre_completo]
+    FROM [dbo].[usuarios] AS u
+    LEFT JOIN [dbo].[fisicas] AS f
+        ON f.[id_usuario] = u.[id_usuario]
+    WHERE u.[id_usuario] = @id_usuario;
+
+    -- Roles asignados
+    SELECT
+        ur.[id_usuario],
+        ur.[id_rol],
+        r.[nombre],
+        r.[descripcion],
+        r.[activo],
+        ur.[fecha_asignacion],
+        ur.[fecha_expiracion]
+    FROM [dbo].[usuario_roles] AS ur
+    INNER JOIN [dbo].[roles] AS r
+        ON r.[id_rol] = ur.[id_rol]
+    WHERE ur.[id_usuario] = @id_usuario
+    ORDER BY ur.[fecha_asignacion] DESC, r.[nombre];
+
+    -- Familias asignadas
+    SELECT
+        uf.[id_usuario],
+        uf.[id_familia],
+        fa.[nombre],
+        fa.[descripcion],
+        fa.[activo],
+        uf.[fecha_asignacion],
+        uf.[fecha_expiracion]
+    FROM [dbo].[usuario_familias] AS uf
+    INNER JOIN [dbo].[familias] AS fa
+        ON fa.[id_familia] = uf.[id_familia]
+    WHERE uf.[id_usuario] = @id_usuario
+    ORDER BY uf.[fecha_asignacion] DESC, fa.[nombre];
+
+    -- Permisos directos
+    SELECT
+        up.[id_usuario],
+        up.[id_permiso],
+        p.[codigo],
+        p.[descripcion],
+        p.[modulo],
+        up.[fecha_asignacion],
+        up.[fecha_expiracion]
+    FROM [dbo].[usuario_permisos] AS up
+    INNER JOIN [dbo].[permisos] AS p
+        ON p.[id_permiso] = up.[id_permiso]
+    WHERE up.[id_usuario] = @id_usuario
+    ORDER BY p.[modulo], p.[codigo];
+
+    -- Preguntas de seguridad
+    SELECT
+        rs.[id],
+        rs.[id_usuario],
+        rs.[id_pregunta],
+        ps.[pregunta],
+        rs.[pista],
+        ps.[estado]
+    FROM [dbo].[respuestas_seguridad] AS rs
+    INNER JOIN [dbo].[preguntas_seguridad] AS ps
+        ON ps.[id_pregunta] = rs.[id_pregunta]
+    WHERE rs.[id_usuario] = @id_usuario
+    ORDER BY ps.[pregunta];
+
+    -- Resumen de seguridad
+    SELECT
+        u.[twofa_habilitado],
+        u.[estado],
+        u.[intentos_fallidos],
+        u.[bloqueado_hasta],
+        u.[ultimo_login]
+    FROM [dbo].[usuarios] AS u
+    WHERE u.[id_usuario] = @id_usuario;
+END
+GO
+
+-- ==========================================
+-- SP 50: sp_listar_fisicas
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_listar_fisicas]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        f.[id_entidad],
+        f.[id_entidad] AS [id_fisica],
+        f.[nombre],
+        f.[apellido],
+        CONCAT(f.[apellido], ', ', f.[nombre]) AS [nombre_completo],
+        f.[fecha_nacimiento],
+        COALESCE(conteos.[cantidad_contactos], 0) AS [cantidad_contactos],
+        COALESCE(conteos.[cantidad_documentos], 0) AS [cantidad_documentos],
+        COALESCE(conteos.[cantidad_domicilios], 0) AS [cantidad_ubicaciones],
+        CAST(CASE WHEN f.[id_usuario] IS NULL THEN 0 ELSE 1 END AS BIT) AS [tiene_usuario],
+        u.[username]
+    FROM [dbo].[fisicas] AS f
+    LEFT JOIN [dbo].[usuarios] AS u
+        ON u.[id_usuario] = f.[id_usuario]
+    OUTER APPLY (
+        SELECT
+            (SELECT COUNT(*) FROM [dbo].[contactos] AS c WHERE c.[id_entidad] = f.[id_entidad]) AS [cantidad_contactos],
+            (SELECT COUNT(*) FROM [dbo].[documentos] AS d WHERE d.[id_entidad] = f.[id_entidad]) AS [cantidad_documentos],
+            (SELECT COUNT(*) FROM [dbo].[domicilios] AS dom WHERE dom.[id_entidad] = f.[id_entidad]) AS [cantidad_domicilios]
+    ) AS conteos
+    ORDER BY f.[apellido], f.[nombre];
+END
+GO
+
+-- ==========================================
+-- SP 51: sp_obtener_fisica_detalle
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_obtener_fisica_detalle]
+    @id_entidad INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Datos de la fisica + usuario asociado
+    SELECT
+        f.[id_entidad],
+        f.[nombre],
+        f.[apellido],
+        f.[fecha_nacimiento],
+        CONCAT(f.[apellido], ', ', f.[nombre]) AS [nombre_completo],
+        f.[id_usuario],
+        u.[username],
+        u.[email],
+        u.[estado] AS [estado_usuario],
+        u.[twofa_habilitado]
+    FROM [dbo].[fisicas] AS f
+    LEFT JOIN [dbo].[usuarios] AS u
+        ON u.[id_usuario] = f.[id_usuario]
+    WHERE f.[id_entidad] = @id_entidad;
+
+    -- Contactos
+    SELECT
+        c.[id_contacto],
+        c.[id_entidad],
+        c.[id_tipo_contacto],
+        tc.[nombre] AS [tipo_contacto],
+        c.[valor],
+        c.[etiqueta],
+        c.[es_principal]
+    FROM [dbo].[contactos] AS c
+    INNER JOIN [dbo].[tipo_contacto] AS tc
+        ON tc.[id_tipo_contacto] = c.[id_tipo_contacto]
+    WHERE c.[id_entidad] = @id_entidad
+    ORDER BY c.[es_principal] DESC, tc.[nombre], c.[valor];
+
+    -- Documentos
+    SELECT
+        d.[id_documento],
+        d.[id_entidad],
+        d.[id_tipo_documento],
+        td.[nombre] AS [tipo_documento],
+        d.[valor],
+        d.[es_principal]
+    FROM [dbo].[documentos] AS d
+    INNER JOIN [dbo].[tipo_documento] AS td
+        ON td.[id_tipo_documento] = d.[id_tipo_documento]
+    WHERE d.[id_entidad] = @id_entidad
+    ORDER BY d.[es_principal] DESC, td.[nombre], d.[valor];
+
+    -- Domicilios
+    SELECT
+        dom.[id_domicilio],
+        dom.[id_entidad],
+        dom.[id_localidad],
+        l.[nombre] AS [localidad],
+        p.[nombre] AS [provincia],
+        pa.[nombre] AS [pais],
+        dom.[calle],
+        dom.[numero],
+        dom.[piso],
+        dom.[depto],
+        dom.[referencia],
+        dom.[tipo],
+        dom.[es_principal]
+    FROM [dbo].[domicilios] AS dom
+    INNER JOIN [dbo].[localidades] AS l
+        ON l.[id_localidad] = dom.[id_localidad]
+    INNER JOIN [dbo].[provincias] AS p
+        ON p.[id_provincia] = l.[id_provincia]
+    INNER JOIN [dbo].[paises] AS pa
+        ON pa.[id_pais] = p.[id_pais]
+    WHERE dom.[id_entidad] = @id_entidad
+    ORDER BY dom.[es_principal] DESC, pa.[nombre], p.[nombre], l.[nombre], dom.[calle];
+END
+GO
+
+-- ==========================================
+-- SP 52: sp_cambiar_username_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_cambiar_username_usuario]
+    @id_usuario INT,
+    @username_nuevo VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF NOT EXISTS (
+            SELECT 1
+            FROM [dbo].[usuarios]
+            WHERE [id_usuario] = @id_usuario
+        )
+        BEGIN
+            THROW 50010, 'El usuario indicado no existe.', 1;
+        END;
+
+        IF EXISTS (
+            SELECT 1
+            FROM [dbo].[usuarios]
+            WHERE [username] = @username_nuevo
+              AND [id_usuario] <> @id_usuario
+        )
+        BEGIN
+            THROW 50011, 'El username indicado ya existe.', 1;
+        END;
+
+        UPDATE [dbo].[usuarios]
+        SET [username] = @username_nuevo
+        WHERE [id_usuario] = @id_usuario;
+
+        SELECT
+            u.[id_usuario],
+            u.[username],
+            u.[email],
+            u.[estado],
+            u.[fecha_alta],
+            u.[ultimo_login]
+        FROM [dbo].[usuarios] AS u
+        WHERE u.[id_usuario] = @id_usuario;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        THROW;
+    END CATCH
+END
+GO
+
+-- ==========================================
+-- SP 53: sp_actualizar_twofa_habilitado_usuario
+-- FIX: era SP 52 duplicado, renumerado a 53
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_actualizar_twofa_habilitado_usuario]
+    @id_usuario INT,
+    @twofa_habilitado BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF NOT EXISTS (
+            SELECT 1
+            FROM [dbo].[usuarios]
+            WHERE [id_usuario] = @id_usuario
+        )
+        BEGIN
+            THROW 50020, 'El usuario indicado no existe.', 1;
+        END;
+
+        UPDATE [dbo].[usuarios]
+        SET [twofa_habilitado] = @twofa_habilitado
+        WHERE [id_usuario] = @id_usuario;
+
+        SELECT
+            u.[id_usuario],
+            u.[username],
+            u.[email],
+            u.[estado],
+            u.[twofa_habilitado],
+            u.[bloqueado_hasta],
+            u.[ultimo_login]
+        FROM [dbo].[usuarios] AS u
+        WHERE u.[id_usuario] = @id_usuario;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        THROW;
+    END CATCH
+END
+GO
+
+-- ==========================================
+-- SP 54: sp_actualizar_respuesta_seguridad_usuario
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_actualizar_respuesta_seguridad_usuario]
+    @id_respuesta INT,
+    @id_usuario INT,
+    @id_pregunta INT,
+    @respuesta_hash VARCHAR(256),
+    @pista VARCHAR(256) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        UPDATE [dbo].[respuestas_seguridad]
+        SET [id_pregunta] = @id_pregunta,
+            [respuesta_hash] = @respuesta_hash,
+            [pista] = @pista
+        WHERE [id] = @id_respuesta
+          AND [id_usuario] = @id_usuario;
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+        THROW;
+    END CATCH
+END
+GO
+
+-- ==========================================
+-- SP 55: sp_obtener_configuracion_sistema
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_obtener_configuracion_sistema]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        cs.[id_config],
+        cs.[pass_min_chars],
+        cs.[pass_max_chars],
+        cs.[pass_requiere_mayusculas],
+        cs.[pass_min_minusculas],
+        cs.[pass_requiere_minusculas],
+        cs.[pass_min_mayusculas],
+        cs.[pass_requiere_numeros],
+        cs.[pass_min_numeros],
+        cs.[pass_requiere_simbolos],
+        cs.[pass_simbolos_permitidos],
+        cs.[pass_min_simbolos],
+        cs.[pass_no_repetir_nunca],
+        cs.[pass_no_repetir_ultimas],
+        cs.[pass_no_datos_personales],
+        cs.[pass_no_repetir_consecutivos],
+        cs.[pass_vigencia_dias],
+        cs.[login_intentos_max],
+        cs.[login_bloqueo_minutos],
+        cs.[preguntas_cantidad],
+        cs.[twofa_digitos],
+        cs.[twofa_expiracion_min],
+        cs.[id_usuario_modifico],
+        cs.[fecha_modificacion],
+        u.[username] AS [usuario_modifico]
+    FROM [dbo].[configuracion_sistema] AS cs
+    LEFT JOIN [dbo].[usuarios] AS u
+        ON u.[id_usuario] = cs.[id_usuario_modifico]
+    WHERE cs.[id_config] = 1;
+END
+GO
+
+-- ==========================================
+-- SP 56: sp_actualizar_configuracion_sistema
+-- ==========================================
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_actualizar_configuracion_sistema]
+    @pass_min_chars INT = NULL,
+    @pass_max_chars INT = NULL,
+    @pass_requiere_mayusculas BIT = NULL,
+    @pass_min_minusculas INT = NULL,
+    @pass_requiere_minusculas BIT = NULL,
+    @pass_min_mayusculas INT = NULL,
+    @pass_requiere_numeros BIT = NULL,
+    @pass_min_numeros INT = NULL,
+    @pass_requiere_simbolos BIT = NULL,
+    @pass_simbolos_permitidos VARCHAR(100) = NULL,
+    @pass_min_simbolos INT = NULL,
+    @pass_no_repetir_nunca BIT = NULL,
+    @pass_no_repetir_ultimas INT = NULL,
+    @pass_no_datos_personales BIT = NULL,
+    @pass_no_repetir_consecutivos BIT = NULL,
+    @pass_vigencia_dias INT = NULL,
+    @login_intentos_max INT = NULL,
+    @login_bloqueo_minutos INT = NULL,
+    @preguntas_cantidad INT = NULL,
+    @twofa_digitos INT = NULL,
+    @twofa_expiracion_min INT = NULL,
+    @id_usuario_modifico INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Verificar que el usuario existe si se proporciona
+        IF @id_usuario_modifico IS NOT NULL
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM [dbo].[usuarios]
+                WHERE [id_usuario] = @id_usuario_modifico
+            )
+            BEGIN
+                THROW 50030, 'El usuario indicado no existe.', 1;
+            END;
+        END;
+
+        -- Si no existe el registro de configuracion, lo creamos
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[configuracion_sistema] WHERE [id_config] = 1)
+        BEGIN
+            INSERT INTO [dbo].[configuracion_sistema] ([id_config])
+            VALUES (1);
+        END;
+
+        -- Actualizar solo los campos que no son NULL
+        UPDATE [dbo].[configuracion_sistema]
+        SET
+            [pass_min_chars] = COALESCE(@pass_min_chars, [pass_min_chars]),
+            [pass_max_chars] = COALESCE(@pass_max_chars, [pass_max_chars]),
+            [pass_requiere_mayusculas] = COALESCE(@pass_requiere_mayusculas, [pass_requiere_mayusculas]),
+            [pass_min_minusculas] = COALESCE(@pass_min_minusculas, [pass_min_minusculas]),
+            [pass_requiere_minusculas] = COALESCE(@pass_requiere_minusculas, [pass_requiere_minusculas]),
+            [pass_min_mayusculas] = COALESCE(@pass_min_mayusculas, [pass_min_mayusculas]),
+            [pass_requiere_numeros] = COALESCE(@pass_requiere_numeros, [pass_requiere_numeros]),
+            [pass_min_numeros] = COALESCE(@pass_min_numeros, [pass_min_numeros]),
+            [pass_requiere_simbolos] = COALESCE(@pass_requiere_simbolos, [pass_requiere_simbolos]),
+            [pass_simbolos_permitidos] = COALESCE(@pass_simbolos_permitidos, [pass_simbolos_permitidos]),
+            [pass_min_simbolos] = COALESCE(@pass_min_simbolos, [pass_min_simbolos]),
+            [pass_no_repetir_nunca] = COALESCE(@pass_no_repetir_nunca, [pass_no_repetir_nunca]),
+            [pass_no_repetir_ultimas] = COALESCE(@pass_no_repetir_ultimas, [pass_no_repetir_ultimas]),
+            [pass_no_datos_personales] = COALESCE(@pass_no_datos_personales, [pass_no_datos_personales]),
+            [pass_no_repetir_consecutivos] = COALESCE(@pass_no_repetir_consecutivos, [pass_no_repetir_consecutivos]),
+            [pass_vigencia_dias] = COALESCE(@pass_vigencia_dias, [pass_vigencia_dias]),
+            [login_intentos_max] = COALESCE(@login_intentos_max, [login_intentos_max]),
+            [login_bloqueo_minutos] = COALESCE(@login_bloqueo_minutos, [login_bloqueo_minutos]),
+            [preguntas_cantidad] = COALESCE(@preguntas_cantidad, [preguntas_cantidad]),
+            [twofa_digitos] = COALESCE(@twofa_digitos, [twofa_digitos]),
+            [twofa_expiracion_min] = COALESCE(@twofa_expiracion_min, [twofa_expiracion_min]),
+            [id_usuario_modifico] = COALESCE(@id_usuario_modifico, [id_usuario_modifico]),
+            [fecha_modificacion] = SYSDATETIME()
+        WHERE [id_config] = 1;
+
+        -- Devolver la configuracion actualizada
+        SELECT
+            cs.[id_config],
+            cs.[pass_min_chars],
+            cs.[pass_max_chars],
+            cs.[pass_requiere_mayusculas],
+            cs.[pass_min_minusculas],
+            cs.[pass_requiere_minusculas],
+            cs.[pass_min_mayusculas],
+            cs.[pass_requiere_numeros],
+            cs.[pass_min_numeros],
+            cs.[pass_requiere_simbolos],
+            cs.[pass_simbolos_permitidos],
+            cs.[pass_min_simbolos],
+            cs.[pass_no_repetir_nunca],
+            cs.[pass_no_repetir_ultimas],
+            cs.[pass_no_datos_personales],
+            cs.[pass_no_repetir_consecutivos],
+            cs.[pass_vigencia_dias],
+            cs.[login_intentos_max],
+            cs.[login_bloqueo_minutos],
+            cs.[preguntas_cantidad],
+            cs.[twofa_digitos],
+            cs.[twofa_expiracion_min],
+            cs.[id_usuario_modifico],
+            cs.[fecha_modificacion],
+            u.[username] AS [usuario_modifico]
+        FROM [dbo].[configuracion_sistema] AS cs
+        LEFT JOIN [dbo].[usuarios] AS u
+            ON u.[id_usuario] = cs.[id_usuario_modifico]
+        WHERE cs.[id_config] = 1;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        THROW;
+    END CATCH
+END
+GO
+
